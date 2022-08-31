@@ -3,7 +3,6 @@
   flex-wrap: wrap;
   width: 100%;
   justify-content: space-evenly;
-  border: 1px solid black;
 }
 
 .crypto-card {

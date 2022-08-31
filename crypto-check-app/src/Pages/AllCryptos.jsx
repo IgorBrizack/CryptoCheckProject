@@ -24,7 +24,14 @@ function AllCryptos() {
   };
 
   const isFavorite = (element) => {
-    localStorage.setItem('favoriteCryptos', JSON.stringify([...favoriteCryptos, element]));
+    const favorites = JSON.parse(localStorage.getItem('favoriteCryptos'));
+    if (favorites.some((crypto) => crypto === element)) {
+      const exclude = favorites.filter((crypto) => crypto !== element);
+      localStorage.setItem('favoriteCryptos', JSON.stringify(exclude));
+      return;
+    }
+    localStorage.setItem('favoriteCryptos', JSON.stringify([...favorites, element]));
+    console.log(favoriteCryptos);
   };
 
   useEffect(() => {
