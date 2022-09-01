@@ -19,6 +19,7 @@ function AllCryptos() {
 
   const [allCryptosData, setAllCryptosData] = useState([]);
   const [usdBrlValue, setUsdBrlValue] = useState(0);
+  const [intervalID, setIntervalId] = useState();
 
   const requestCryptosFromApi = async () => {
     const response = await fetch(CRYPTO_COINS_ENDPOINT);
@@ -50,7 +51,6 @@ function AllCryptos() {
     let newContent;
     switch (typeOfSearch) {
       case 'text': {
-        console.log(typeOfSearch);
         const content = allCryptosData.filter((coin) => (coin.name.toUpperCase())
           .includes(value.toUpperCase()));
         newContent = content;
@@ -61,24 +61,18 @@ function AllCryptos() {
         newContent = content;
       }
     }
-    console.log('chamando');
     setFilteredContent(newContent);
     setIsFiltered(!isFiltered);
   };
 
-  // const filterInterval = () => {
-
-  // };
-
   useEffect(() => {
-    let intervalId;
     if (filtered.value.length > 0 && filtered.typeOfSearch === 'text') {
-      clearInterval(intervalId);
+      clearInterval(intervalID);
       filterFunction();
-      intervalId = setInterval(filterFunction, 30000);
+      const interval = setInterval(filterFunction, 30000);
+      setIntervalId(interval);
     } else {
-      clearInterval(intervalId);
-      console.log(intervalId);
+      clearInterval(intervalID);
       setFilteredContent(allCryptosData);
       setIsFiltered(!isFiltered);
     }
