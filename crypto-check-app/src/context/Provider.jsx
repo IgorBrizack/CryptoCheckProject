@@ -20,7 +20,7 @@ function Provider({ children }) {
     setIsFiltered,
     setFilteredContent,
     filteredContent,
-  }), [isFiltered, filtered, filtered]);
+  }), [isFiltered, filtered]);
 
   return (
     <context.Provider value={providerState}>

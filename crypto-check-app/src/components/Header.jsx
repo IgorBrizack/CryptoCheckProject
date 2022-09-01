@@ -4,25 +4,22 @@ import context from '../context/Context';
 function Header() {
   const {
     setFilter,
-    setIsFiltered,
-    isFiltered,
   } = useContext(context);
 
   const [search, setSearch] = useState([]);
 
   const handleChange = ({ target }) => {
-    if (target.name === 'searchInput') setSearch({ typeOfSearch: 'text', value: target.value });
+    if (target.name === 'searchInput' && target.value.length > 0) setSearch({ typeOfSearch: 'text', value: target.value });
+    if (target.name === 'searchInput' && target.value.length === 0) setSearch({ typeOfSearch: '', value: '' });
   };
 
   const execSearch = () => {
-    console.log(isFiltered);
     setFilter(search);
-    setIsFiltered(!isFiltered);
   };
 
   return (
     <header>
-      <h1>não sei o que por aca</h1>
+      <h1>SITE DO ECONOMISTA COISINHA</h1>
       <div>
         <label htmlFor="searchInput">
           <input

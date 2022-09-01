@@ -13,6 +13,8 @@ function AllCryptos() {
     setFilteredContent,
     filtered: { typeOfSearch, value },
     filteredContent,
+    isFiltered,
+    setIsFiltered,
   } = useContext(context);
 
   const [allCryptosData, setAllCryptosData] = useState([]);
@@ -35,6 +37,7 @@ function AllCryptos() {
     requestCryptosFromApi();
     requestUsdBrlValue();
     setInterval(() => requestCryptosFromApi(), 30000);
+    setInterval(() => requestUsdBrlValue(), 30000);
   }, []);
 
   useEffect(() => {
@@ -44,13 +47,13 @@ function AllCryptos() {
   }, []);
 
   const filterFunction = () => {
-    console.log(filtered.typeOfSearch);
     let newContent;
     switch (typeOfSearch) {
       case 'text': {
-        const content = allCryptosData.filter((coin) => coin.name.includes(value));
+        console.log(typeOfSearch);
+        const content = allCryptosData.filter((coin) => (coin.name.toUpperCase())
+          .includes(value.toUpperCase()));
         newContent = content;
-        console.log('chegando aqui');
         break;
       }
       default: {
@@ -58,17 +61,33 @@ function AllCryptos() {
         newContent = content;
       }
     }
+    console.log('chamando');
     setFilteredContent(newContent);
+    setIsFiltered(!isFiltered);
   };
 
+  // const filterInterval = () => {
+
+  // };
+
   useEffect(() => {
-    if (filtered.value.length > 0) filterFunction();
+    let intervalId;
+    if (filtered.value.length > 0 && filtered.typeOfSearch === 'text') {
+      clearInterval(intervalId);
+      filterFunction();
+      intervalId = setInterval(filterFunction, 30000);
+    } else {
+      clearInterval(intervalId);
+      console.log(intervalId);
+      setFilteredContent(allCryptosData);
+      setIsFiltered(!isFiltered);
+    }
   }, [filtered]);
 
   return (
     <div>
       <Header />
-      {filteredContent.length > 0 ? (
+      {filteredContent[0] ? (
         <div className="cryptos-main-container">
           {filteredContent.map((crypto) => (
             <div key={crypto.id} className="crypto-card">
