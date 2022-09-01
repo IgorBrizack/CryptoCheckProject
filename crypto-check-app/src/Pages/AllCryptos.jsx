@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-// import data from '../Mock/cryptoData';
-import whiteHeartIcon from '../images/whiteHeartIcon.svg';
+import FavoriteButton from '../components/FavoriteButton';
+import Header from '../components/Header';
 
 const CRYPTO_COINS_ENDPOINT = 'https://api.nomics.com/v1/currencies/ticker?key=70fbd3b277ba43c183a1ff59c0e24fe2158ef9b6&';
 
@@ -9,7 +9,7 @@ const USD_BRL_ENDPOINT = 'https://economia.awesomeapi.com.br/last/USD-BRL';
 function AllCryptos() {
   const [allCryptosData, setAllCryptosData] = useState([]);
   const [usdBrlValue, setUsdBrlValue] = useState(0);
-  const [favoriteCryptos, setFavoriteCryptos] = useState([]);
+
   const requestCryptosFromApi = async () => {
     const response = await fetch(CRYPTO_COINS_ENDPOINT);
     const responseJSON = await response.json();
@@ -23,17 +23,6 @@ function AllCryptos() {
     setUsdBrlValue(responseJSON.USDBRL.bid);
   };
 
-  const isFavorite = (element) => {
-    const favorites = JSON.parse(localStorage.getItem('favoriteCryptos'));
-    if (favorites.some((crypto) => crypto === element)) {
-      const exclude = favorites.filter((crypto) => crypto !== element);
-      localStorage.setItem('favoriteCryptos', JSON.stringify(exclude));
-      return;
-    }
-    localStorage.setItem('favoriteCryptos', JSON.stringify([...favorites, element]));
-    console.log(favoriteCryptos);
-  };
-
   useEffect(() => {
     requestCryptosFromApi();
     requestUsdBrlValue();
@@ -43,18 +32,12 @@ function AllCryptos() {
   useEffect(() => {
     if (!JSON.parse(localStorage.getItem('favoriteCryptos'))) {
       localStorage.setItem('favoriteCryptos', JSON.stringify([]));
-    } else {
-      const favorites = JSON.parse(localStorage.getItem('favoriteCryptos'));
-      console.log(favorites);
-      setFavoriteCryptos(favorites);
     }
   }, []);
 
   return (
     <div>
-      <h1>
-        Coisinha Site Cryptos.com
-      </h1>
+      <Header />
       <div className="cryptos-main-container">
         {allCryptosData.length > 0 && (allCryptosData.map((crypto) => (
           <div key={crypto.id} className="crypto-card">
@@ -65,16 +48,9 @@ function AllCryptos() {
             <p>
               {`Maior alta US$ ${Number(crypto.high).toFixed(2)}`}
             </p>
-            <button
-              type="button"
-              onClick={() => isFavorite(crypto.id)}
-            >
-              <img
-                className="crypto-card-favorite-button"
-                src={whiteHeartIcon}
-                alt="favoriteIcon"
-              />
-            </button>
+            <FavoriteButton
+              cryptoId={crypto.id}
+            />
           </div>
         )))}
       </div>
