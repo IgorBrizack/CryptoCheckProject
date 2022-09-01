@@ -10,22 +10,50 @@ const USD_BRL_ENDPOINT = 'https://economia.awesomeapi.com.br/last/USD-BRL';
 function AllCryptos() {
   const {
     filtered,
-    setFilteredContent,
-    filtered: { typeOfSearch, value },
-    filteredContent,
-    isFiltered,
-    setIsFiltered,
+    check,
   } = useContext(context);
 
   const [allCryptosData, setAllCryptosData] = useState([]);
   const [usdBrlValue, setUsdBrlValue] = useState(0);
-  const [intervalID, setIntervalId] = useState();
+  const [cryptosInterval, setCryptosInterval] = useState();
+  const [usdBrlInterval, setUsdBrlInterval] = useState();
+  const [filteredContent, setFilteredContent] = useState([]);
+
+  const filterFunction = (data) => {
+    let newContent;
+    switch (filtered.typeOfSearch) {
+      case 'text': {
+        const content = data.filter((coin) => (coin.name.toUpperCase())
+          .includes(filtered.value.toUpperCase()));
+        newContent = content;
+        console.log('dentro da filter function:', newContent[0].price);
+        break;
+      }
+      default: {
+        const content = data;
+        newContent = content;
+      }
+    }
+    console.log(newContent);
+    setFilteredContent(newContent);
+  };
+
+  const checkFilters = () => {
+    console.log('checkfilters');
+    console.log(filtered);
+    if (filtered.value.length > 0 && filtered.typeOfSearch === 'text') {
+      console.log('use effect:', allCryptosData[11].price);
+      filterFunction(allCryptosData);
+    }
+  };
 
   const requestCryptosFromApi = async () => {
     const response = await fetch(CRYPTO_COINS_ENDPOINT);
     const responseJSON = await response.json();
     const sortResponse = responseJSON.sort((a, b) => a.name.localeCompare(b.name));
     setAllCryptosData(sortResponse);
+    console.log('vindo após chamada api', filtered);
+    if (check) checkFilters();
   };
 
   const requestUsdBrlValue = async () => {
@@ -35,10 +63,14 @@ function AllCryptos() {
   };
 
   useEffect(() => {
+    clearInterval(cryptosInterval);
+    clearInterval(usdBrlInterval);
     requestCryptosFromApi();
     requestUsdBrlValue();
-    setInterval(() => requestCryptosFromApi(), 30000);
-    setInterval(() => requestUsdBrlValue(), 30000);
+    const cryptos = setInterval(() => requestCryptosFromApi(), 30000);
+    const usdBrl = setInterval(() => requestUsdBrlValue(), 30000);
+    setCryptosInterval(cryptos);
+    setUsdBrlInterval(usdBrl);
   }, []);
 
   useEffect(() => {
@@ -47,35 +79,8 @@ function AllCryptos() {
     }
   }, []);
 
-  const filterFunction = () => {
-    let newContent;
-    switch (typeOfSearch) {
-      case 'text': {
-        const content = allCryptosData.filter((coin) => (coin.name.toUpperCase())
-          .includes(value.toUpperCase()));
-        newContent = content;
-        break;
-      }
-      default: {
-        const content = allCryptosData;
-        newContent = content;
-      }
-    }
-    setFilteredContent(newContent);
-    setIsFiltered(!isFiltered);
-  };
-
   useEffect(() => {
-    if (filtered.value.length > 0 && filtered.typeOfSearch === 'text') {
-      clearInterval(intervalID);
-      filterFunction();
-      const interval = setInterval(filterFunction, 30000);
-      setIntervalId(interval);
-    } else {
-      clearInterval(intervalID);
-      setFilteredContent(allCryptosData);
-      setIsFiltered(!isFiltered);
-    }
+    if (check) checkFilters();
   }, [filtered]);
 
   return (

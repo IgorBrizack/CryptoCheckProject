@@ -4,6 +4,7 @@ import context from '../context/Context';
 function Header() {
   const {
     setFilter,
+    setCheck,
   } = useContext(context);
 
   const [search, setSearch] = useState([]);
@@ -14,6 +15,7 @@ function Header() {
   };
 
   const execSearch = () => {
+    setCheck(true);
     setFilter(search);
   };
 
