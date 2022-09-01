@@ -8,11 +8,15 @@ const CRYPTO_COINS_ENDPOINT = 'https://api.nomics.com/v1/currencies/ticker?key=7
 const USD_BRL_ENDPOINT = 'https://economia.awesomeapi.com.br/last/USD-BRL';
 
 function AllCryptos() {
-  const { filtered, filtered: { value, typeOfSearch } } = useContext(context);
+  const {
+    filtered,
+    setFilteredContent,
+    filtered: { typeOfSearch, value },
+    filteredContent,
+  } = useContext(context);
+
   const [allCryptosData, setAllCryptosData] = useState([]);
   const [usdBrlValue, setUsdBrlValue] = useState(0);
-  const [isFiltered, setIsFiltered] = useState(false);
-  const [filteredContent, setFilteredContet] = useState([]);
 
   const requestCryptosFromApi = async () => {
     const response = await fetch(CRYPTO_COINS_ENDPOINT);
@@ -37,31 +41,34 @@ function AllCryptos() {
     if (!JSON.parse(localStorage.getItem('favoriteCryptos'))) {
       localStorage.setItem('favoriteCryptos', JSON.stringify([]));
     }
-    if (filtered) setIsFiltered(true);
   }, []);
 
-  // { typeOfSearch: 'text', value: target.value }
-
   const filterFunction = () => {
+    console.log(filtered.typeOfSearch);
+    let newContent;
     switch (typeOfSearch) {
       case 'text': {
-        const byText = allCryptosData.filter((coin) => coin.name.includes(value));
-        setFilteredContet(byText);
+        const content = allCryptosData.filter((coin) => coin.name.includes(value));
+        newContent = content;
+        console.log('chegando aqui');
         break;
       }
-      default:
-        console.log('arroz');
+      default: {
+        const content = allCryptosData;
+        newContent = content;
+      }
     }
+    setFilteredContent(newContent);
   };
 
   useEffect(() => {
-    filterFunction();
-  }, [isFiltered]);
+    if (filtered.value.length > 0) filterFunction();
+  }, [filtered]);
 
   return (
     <div>
       <Header />
-      {isFiltered ? (
+      {filteredContent.length > 0 ? (
         <div className="cryptos-main-container">
           {filteredContent.map((crypto) => (
             <div key={crypto.id} className="crypto-card">

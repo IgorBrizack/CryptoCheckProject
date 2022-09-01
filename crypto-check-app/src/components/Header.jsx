@@ -1,11 +1,23 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState } from 'react';
 import context from '../context/Context';
 
 function Header() {
-  const { setFilter } = useContext(context);
+  const {
+    setFilter,
+    setIsFiltered,
+    isFiltered,
+  } = useContext(context);
+
+  const [search, setSearch] = useState([]);
 
   const handleChange = ({ target }) => {
-    if (target.name === 'searchInput') setFilter({ typeOfSearch: 'text', value: target.value });
+    if (target.name === 'searchInput') setSearch({ typeOfSearch: 'text', value: target.value });
+  };
+
+  const execSearch = () => {
+    console.log(isFiltered);
+    setFilter(search);
+    setIsFiltered(!isFiltered);
   };
 
   return (
@@ -23,6 +35,13 @@ function Header() {
             className="inputText"
           />
         </label>
+        <button
+          type="button"
+          data-testid="exec-search-btn"
+          onClick={() => execSearch()}
+        >
+          Buscar
+        </button>
       </div>
     </header>
   );
