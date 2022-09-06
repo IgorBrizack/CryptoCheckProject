@@ -7,6 +7,9 @@ function Header() {
     setCheck,
   } = useContext(context);
 
+  const qualquer = useContext(context);
+  console.log('qualquer', qualquer);
+
   const [search, setSearch] = useState([]);
 
   const handleChange = ({ target }) => {
@@ -21,7 +24,7 @@ function Header() {
 
   return (
     <header>
-      <h1>SITE DO ECONOMISTA COISINHA</h1>
+      <h1>cryptos check</h1>
       <div>
         <label htmlFor="searchInput">
           <input
