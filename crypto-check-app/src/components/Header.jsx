@@ -7,9 +7,6 @@ function Header() {
     setCheck,
   } = useContext(context);
 
-  const qualquer = useContext(context);
-  console.log('qualquer', qualquer);
-
   const [search, setSearch] = useState([]);
 
   const handleChange = ({ target }) => {

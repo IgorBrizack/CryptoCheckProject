@@ -13,13 +13,12 @@ function AllCryptos() {
     check,
   } = useContext(context);
 
-  const qualquerNoallcryptos = useContext(context);
-  console.log(qualquerNoallcryptos, 'vindo do allCryptos');
+  useEffect(() => {
+    console.log('filtered', filtered);
+  }, [filtered]);
 
   const [allCryptosData, setAllCryptosData] = useState([]);
   const [usdBrlValue, setUsdBrlValue] = useState(0);
-  const [cryptosInterval, setCryptosInterval] = useState();
-  const [usdBrlInterval, setUsdBrlInterval] = useState();
   const [filteredContent, setFilteredContent] = useState([]);
 
   const filterFunction = (data) => {
@@ -29,7 +28,6 @@ function AllCryptos() {
         const content = data.filter((coin) => (coin.name.toUpperCase())
           .includes(filtered.value.toUpperCase()));
         newContent = content;
-        console.log('dentro da filter function:', newContent[0].price);
         break;
       }
       default: {
@@ -37,45 +35,51 @@ function AllCryptos() {
         newContent = content;
       }
     }
-    console.log(newContent);
     setFilteredContent(newContent);
   };
 
   const checkFilters = () => {
-    console.log('vindo do checkfilters', filtered);
     if (filtered.value.length > 0 && filtered.typeOfSearch === 'text') {
-      console.log('use effect:', allCryptosData[11].price);
       filterFunction(allCryptosData);
     }
   };
 
   const requestCryptosFromApi = async () => {
     const response = await fetch(CRYPTO_COINS_ENDPOINT);
+    console.log('response API', response);
     const responseJSON = await response.json();
+    console.log('requestCryptosFromApi JSON', responseJSON);
     const sortResponse = responseJSON.sort((a, b) => a.name.localeCompare(b.name));
     if (sortResponse) setAllCryptosData(sortResponse);
-    console.log('filtered vindo após chamada api', filtered);
-    console.log('check na solicitação da API', check);
-    if (check) checkFilters();
   };
 
   const requestUsdBrlValue = async () => {
     const response = await fetch(USD_BRL_ENDPOINT);
     const responseJSON = await response.json();
-    if (responseJSON) setUsdBrlValue(responseJSON.USDBRL.bid);
-    console.log('filtered vindo após chamada api2', filtered);
-    console.log('check na solicitação da API2', check);
+    if (responseJSON) {
+      checkFilters();
+      setUsdBrlValue(responseJSON.USDBRL.bid);
+    }
   };
 
   useEffect(() => {
-    clearInterval(cryptosInterval);
-    clearInterval(usdBrlInterval);
+    console.log('Initial request');
     requestCryptosFromApi();
     requestUsdBrlValue();
-    const cryptos = setInterval(() => requestCryptosFromApi(), 30000);
-    const usdBrl = setInterval(() => requestUsdBrlValue(), 30000);
-    setCryptosInterval(cryptos);
-    setUsdBrlInterval(usdBrl);
+  }, []);
+
+  useEffect(() => {
+    setInterval(() => {
+      console.log('requesting requestCryptosFromApi');
+      requestCryptosFromApi();
+    }, 30000);
+  }, []);
+
+  useEffect(() => {
+    setInterval(() => {
+      console.log('requesting requestUsdBrlValue');
+      requestUsdBrlValue();
+    }, 30000);
   }, []);
 
   useEffect(() => {
